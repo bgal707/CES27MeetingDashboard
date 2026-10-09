@@ -398,5 +398,14 @@ $("#file").addEventListener("change",async e=>{
 
 rows=normalize(SEED); render();
 </script>
-
+<script>
+(function () {
+  function sendHeight() {
+    var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    parent.postMessage({ type: "venueload-height", height: h }, "*");
+  }
+  window.addEventListener("load", sendHeight);
+  if (window.ResizeObserver) new ResizeObserver(sendHeight).observe(document.body);
+})();
+</script>
 </body></html>
