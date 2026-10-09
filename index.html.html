@@ -1,0 +1,402 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CES 2027 Venue Load</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: control bar → priority venue cards (Delmonico, Gjelina) → secondary venues → day×hour grid → meeting list */
+:root{
+  --bg:#f6f7f8; --surface:#ffffff; --sunken:#eef0f2; --line:#dde1e5;
+  --fg:#14181c; --fg2:#4c5560; --muted:#78828c;
+  --s-del:#2a78d6; --s-gje:#eb6834; --s-mil:#1baf7a; --s-oth:#9aa3ad;
+  --good:#1d8a4a; --good-bg:#e3f4ea; --warn:#a86a00; --warn-bg:#fdf1d8; --crit:#c63a39; --crit-bg:#fbe5e4;
+  --chip-on:#14181c; --chip-on-fg:#ffffff;
+  --f-display:"Archivo",system-ui,sans-serif; --f-body:"Public Sans",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111417; --surface:#191d21; --sunken:#20252a; --line:#2e353c;
+  --fg:#f2f4f6; --fg2:#b9c1c9; --muted:#8a949e;
+  --s-del:#3987e5; --s-gje:#d95926; --s-mil:#199e70; --s-oth:#6b7580;
+  --good:#5cc98a; --good-bg:#16301f; --warn:#e6b34d; --warn-bg:#352a12; --crit:#f07c7b; --crit-bg:#3a1c1c;
+  --chip-on:#f2f4f6; --chip-on-fg:#111417; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111417; --surface:#191d21; --sunken:#20252a; --line:#2e353c;
+  --fg:#f2f4f6; --fg2:#b9c1c9; --muted:#8a949e;
+  --s-del:#3987e5; --s-gje:#d95926; --s-mil:#199e70; --s-oth:#6b7580;
+  --good:#5cc98a; --good-bg:#16301f; --warn:#e6b34d; --warn-bg:#352a12; --crit:#f07c7b; --crit-bg:#3a1c1c;
+  --chip-on:#f2f4f6; --chip-on-fg:#111417; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 56px;display:flex;flex-direction:column;gap:22px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,4vw,36px);letter-spacing:-.01em;margin:4px 0 2px;text-wrap:balance}
+.sub{color:var(--fg2)}
+.src{display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-size:12px;color:var(--muted);min-width:0}
+.src code{font-family:var(--f-mono);font-size:11px;word-break:break-all}
+.btn{font:600 13px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:8px 14px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--fg2)}
+.btn:focus-visible,.chip:focus-visible,input:focus-visible{outline:2px solid var(--s-del);outline-offset:2px}
+.controls{display:flex;flex-wrap:wrap;gap:12px 26px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.cg{display:flex;flex-direction:column;gap:6px;min-width:0}
+.cg>span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 13px var(--f-body);padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--fg2);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--chip-on);color:var(--chip-on-fg);border-color:var(--chip-on)}
+.caps{display:flex;flex-wrap:wrap;gap:10px}
+.cap{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--fg2)}
+.cap i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.cap input{width:62px;font:500 13px var(--f-mono);padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
+.section-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h2{font-family:var(--f-display);font-weight:700;font-size:18px;margin:0}
+.note{font-size:12px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 16px 10px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.secondary{padding-top:12px}
+.vhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.vname{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-weight:700;font-size:20px}
+.secondary .vname{font-size:16px}
+.vname i{width:12px;height:12px;border-radius:3px}
+.prio{font:600 10px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+.pill{font:600 12px var(--f-body);padding:3px 9px;border-radius:999px;white-space:nowrap;display:inline-flex;gap:5px;align-items:center}
+.pill.good{background:var(--good-bg);color:var(--good)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.crit{background:var(--crit-bg);color:var(--crit)} .pill.none{background:var(--sunken);color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{display:flex;flex-direction:column;gap:1px}
+.stat b{font:600 22px var(--f-mono);font-variant-numeric:tabular-nums}
+.secondary .stat b{font-size:18px}
+.stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.ax{font:11px var(--f-mono);fill:var(--muted)}
+.vl{font:600 11px var(--f-mono);fill:var(--fg)}
+.capl{font:600 10px var(--f-body);fill:var(--fg2);letter-spacing:.04em}
+.tip{position:absolute;pointer-events:none;background:var(--fg);color:var(--bg);font-size:12px;padding:7px 9px;border-radius:6px;max-width:240px;z-index:3;line-height:1.35}
+.tip b{font-family:var(--f-mono)}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--sunken)}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.hm td.n{min-width:52px;text-align:center}
+.hm td.cell{font-family:var(--f-mono);text-align:center;font-variant-numeric:tabular-nums}
+.vdot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:baseline}
+td.wrapc{white-space:normal;min-width:220px}
+.st{font-size:12px;font-weight:600;text-transform:capitalize}
+.st.scheduled{color:var(--good)} .st.pending{color:var(--warn)} .st.canceled,.st.rejected{color:var(--muted);text-decoration:line-through}
+.err{color:var(--crit);font-size:12px}
+footer{font-size:12px;color:var(--muted);max-width:75ch}
+@media (max-width:520px){.stats{grid-template-columns:repeat(3,1fr)}.src{align-items:flex-start}.grid2{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <div class="eyebrow">Lenovo · CES 2027 · The Venetian Las Vegas</div>
+    <h1>CES 2027 Venue Load</h1>
+    <div class="sub">Attendees arriving per hour at each venue, against hourly capacity.</div>
+  </div>
+  <div class="src">
+    <span>Data: <code id="srcName"></code></span>
+    <label class="btn" for="file" tabindex="0">Load a newer meetings export</label>
+    <input type="file" id="file" accept=".xls,.xlsx,.csv" hidden>
+    <span id="fileErr" class="err" hidden></span>
+  </div>
+</header>
+
+<section class="controls" aria-label="Filters">
+  <div class="cg"><span>Day</span><div class="chips" id="days"></div></div>
+  <div class="cg"><span>Meeting status</span><div class="chips" id="statuses"></div></div>
+  <div class="cg"><span>Count</span><div class="chips" id="countMode"></div></div>
+  <div class="cg"><span>Capacity / hour (blank = none)</span><div class="caps" id="caps"></div></div>
+</section>
+
+<section class="section-h"><h2 id="dayTitle">Priority venues</h2><span class="note">Bars = people whose meeting starts in that hour. Dashed line = capacity.</span></section>
+<div class="grid2" id="prio"></div>
+<div class="grid2" id="secondary"></div>
+
+<section style="display:flex;flex-direction:column;gap:10px">
+  <div class="section-h"><h2>Hour-by-hour, all days</h2><span class="note">Shaded by share of capacity · venues without a cap are shaded by count</span></div>
+  <div class="tablewrap"><table class="hm" id="heat"></table></div>
+</section>
+
+<section class="card" id="entryPanel" style="gap:14px" aria-labelledby="entryH">
+  <div class="section-h"><div><div class="eyebrow">Separate view</div><h2 id="entryH">Entry traffic · hour-by-hour, all days</h2></div><div class="chips" id="entryChips"></div></div>
+  <div class="stats" id="entryStats" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))"></div>
+  <span class="note" id="entryNote"></span>
+  <div class="tablewrap"><table class="hm" id="heatEntry"></table></div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:10px">
+  <div class="section-h"><h2 id="listTitle">Meetings</h2><span class="note" id="listNote"></span></div>
+  <div class="tablewrap"><table id="list"></table></div>
+</section>
+
+<footer>Hour buckets use each meeting's start time (a 9:15 AM meeting counts in the 9 AM hour); the export has no end times, so a meeting is counted only in its starting hour. "Guests" counts the Attendees column; "Guests + staff" adds the Staff column. Locations are grouped by name: anything containing Delmonico, Gjelina or Milos rolls up to that venue; everything else shows under Other spaces. Capacity values are saved in this browser only.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const SEED = [{"Meeting ID": "LE-484677", "Meeting Title": "Lenovo with Milos Table 1 - The Venetian Las Vegas, Zeno Group", "Meeting Type": "Zeno Group", "Date": "Jan 06, 2027", "Start Time": "09:00 AM", "Location": "Milos Table 1 (Room)", "Status": "pending", "Attendees": "William Example <William@example.com>, Jane Example <Jane@example.com>", "Staff": "Natalie Bean <natalie.bean@zenogroup.com>", "Checked-In Attendees": null}, {"Meeting ID": "LE-469634", "Meeting Title": "Lenovo, Captello with Delmonico - SSG - Private Meeting Room - Kitchen's Table - The Venetian Las Vegas, SSG - Meeting Space", "Meeting Type": "SSG - Meeting Space", "Date": "Jan 05, 2027", "Start Time": "02:30 PM", "Location": "Delmonico - SSG - Private Meeting Room - Kitchen's Table (Room)", "Status": "pending", "Attendees": "Jane Example <Jane@example.com>, AmandaTest ErissonTest <ajerisson+test@leadliaison.com>", "Staff": "Christine Universal <cuniversal@lenovo.com>, Kevin Nelson <knn@lenovo.com>, Marijan Dancevski <mdancevski@lenovo.com>", "Checked-In Attendees": null}, {"Meeting ID": "LE-043553", "Meeting Title": "Test Meeting with Amanda Erisson", "Meeting Type": "SSG - Meeting Space", "Date": "Jan 05, 2027", "Start Time": "01:30 PM", "Location": "Delmonico - SSG - Private Meeting Room - Kitchen's Table (Room)", "Status": "pending", "Attendees": "Jane Example <Jane@example.com>, AmandaTest ErissonTest <ajerisson+test@leadliaison.com>", "Staff": "Jon Wolff <jwolff1@lenovo.com>, Christine Universal <cuniversal@lenovo.com>", "Checked-In Attendees": null}, {"Meeting ID": "LE-109749", "Meeting Title": "Example, Company Name with Lenovo Software, Delmonico Entrance - The Venetian Las Vegas, Delmonico Entry", "Meeting Type": "Delmonico Entry", "Date": "Jan 07, 2027", "Start Time": "09:00 AM", "Location": "Delmonico Entrance (Room)", "Status": "scheduled", "Attendees": "Jane Example <Jane@example.com>, William Example <William@example.com>, Test Test2 <test2@company.com>", "Staff": "Captello Support <ll.support.12314@leadliaison.com>", "Checked-In Attendees": null}, {"Meeting ID": "LE-131274", "Meeting Title": "Captello with Lenovo Software, Luxury King Exhibit Suite 29-318 - The Venetian Las Vegas, AP - Meeting Space", "Meeting Type": "AP - Meeting Space", "Date": "Jan 06, 2027", "Start Time": "12:30 PM", "Location": "Luxury King Exhibit Suite 29-318 (Room)", "Status": "pending", "Attendees": "AmandaTest ErissonTest <ajerisson+test@leadliaison.com>", "Staff": "Captello Support <ll.support.12314@leadliaison.com>", "Checked-In Attendees": null}, {"Meeting ID": "LE-039502", "Meeting Title": "Gjelina Main Dining Room Table 2 - The Venetian Las Vegas, NA - Meeting Space", "Meeting Type": "NA - Meeting Space", "Date": "Jan 06, 2027", "Start Time": "09:15 AM", "Location": "Gjelina Main Dining Room Table 2 (Room)", "Status": "scheduled", "Attendees": "Linden Cowan <lcowan@lenovo.com>", "Staff": "Nia Allison <tallison3@lenovo.com>", "Checked-In Attendees": null}, {"Meeting ID": "LE-778302", "Meeting Title": "Milos Entry with Lenovo", "Meeting Type": "Milos Entry", "Date": "Jan 05, 2027", "Start Time": "01:00 PM", "Location": "Milos Entrance (Room)", "Status": "scheduled", "Attendees": "Test1 Test2 <spancoeesg+01@gmail.com>", "Staff": "Brendan Shuff <bshuff@esg.us>", "Checked-In Attendees": null}, {"Meeting ID": "LE-049336", "Meeting Title": "Delmonico Entry with Lenovo", "Meeting Type": "Delmonico Entry", "Date": "Jan 05, 2027", "Start Time": "04:00 PM", "Location": "Delmonico Entrance (Room)", "Status": "scheduled", "Attendees": "Christine Universal <cuniversal@lenovo.com>, Joe Morawic <jmorawic@gmail.com>", "Staff": "CES SSG Tester <cesssgtester@lenovo.com>", "Checked-In Attendees": null}, {"Meeting ID": "LE-990900", "Meeting Title": "Test with Lenovo, Gjelina Private Dining Room 1 - The Venetian Las Vegas, NA - Meeting Space", "Meeting Type": "NA - Meeting Space", "Date": "Jan 07, 2027", "Start Time": "09:00 AM", "Location": "Gjelina Private Dining Room 1 (Room)", "Status": "pending", "Attendees": "Joe Morawic <joemarawic@gmail.com>", "Staff": "Stefan Pancoe <spancoe@esg.us>", "Checked-In Attendees": null}, {"Meeting ID": "Q7WNWQ", "Meeting Title": "Delmonico Entry with Lenovo, ESG, Test 1", "Meeting Type": "Delmonico Entry", "Date": "Jan 05, 2027", "Start Time": "04:00 PM", "Location": "Delmonico Entrance (Room)", "Status": "scheduled", "Attendees": "Brian Gallagher <bgallagher@esg.us>, Stefan Pancoe <spancoe@esg.us>, Brian Gallagher <spancoe@gmail.com>, Stefan Pancoe <spancoeesg@gmail.com>", "Staff": "Brendan Shuff <bshuff@esg.us>", "Checked-In Attendees": null}, {"Meeting ID": "T3BYAY", "Meeting Title": "Test with Delmonico SSG Meeting Space 2 - The Venetian Las Vegas, SSG - Meeting Space", "Meeting Type": "SSG - Meeting Space", "Date": "Jan 06, 2027", "Start Time": "08:30 AM", "Location": "Delmonico - SSG - Private Meeting Room - Kitchen's Table (Room)", "Status": "pending", "Attendees": "Joe Morawic <joemarawic@gmail.com>", "Staff": "Catherine Linville <cgreen2@lenovo.com>", "Checked-In Attendees": null}, {"Meeting ID": "4RZ35E", "Meeting Title": "Delmonico Entry with Lenovo Software, Lenovo, Test", "Meeting Type": "Delmonico Entry", "Date": "Jan 06, 2027", "Start Time": "09:00 AM", "Location": "Delmonico Entrance (Room)", "Status": "scheduled", "Attendees": "Test1 Test2 <spancoeesg+01@gmail.com>, Guest 2 Guest 2 <ssp5013@psu.edu>", "Staff": "Captello Support <ll.support.12314@leadliaison.com>", "Checked-In Attendees": null}, {"Meeting ID": "KRUDD3", "Meeting Title": "Milos Entrance - The Venetian Las Vegas, Milos Entry", "Meeting Type": "Milos Entry", "Date": "Jan 06, 2027", "Start Time": "09:15 AM", "Location": "Milos Entrance (Room)", "Status": "scheduled", "Attendees": null, "Staff": "Brendan Shuff <bshuff@esg.us>", "Checked-In Attendees": null}, {"Meeting ID": "MCG1JW", "Meeting Title": "Milos Entry with Lenovo Software, Lenovo", "Meeting Type": "Milos Entry", "Date": "Jan 06, 2027", "Start Time": "11:00 AM", "Location": "Milos Entrance (Room)", "Status": "scheduled", "Attendees": "Test Test <test@test.com>", "Staff": "Captello Support <ll.support.12314@leadliaison.com>", "Checked-In Attendees": null}, {"Meeting ID": "BFJKIY", "Meeting Title": "Milos Entry with Lenovo", "Meeting Type": "Milos Entry", "Date": "Jan 08, 2027", "Start Time": "08:00 AM", "Location": "Milos Entrance (Room)", "Status": "scheduled", "Attendees": "Hailey MacKay <hmackay@lenovo.com>", "Staff": "Brendan Shuff <bshuff@esg.us>", "Checked-In Attendees": null}, {"Meeting ID": "XBBP1P", "Meeting Title": "Delmonico Entry with Lenovo Software, esg", "Meeting Type": "Delmonico Entry", "Date": "Jan 05, 2027", "Start Time": "01:00 PM", "Location": "Delmonico Entrance (Room)", "Status": "scheduled", "Attendees": "Brian Gallagher <bgallagher@esg.us>", "Staff": "Captello Support <ll.support.12314@leadliaison.com>", "Checked-In Attendees": null}, {"Meeting ID": "MV31HV", "Meeting Title": "Delmonico Entry with Lenovo Software, esg, ESG", "Meeting Type": "Delmonico Entry", "Date": "Jan 05, 2027", "Start Time": "02:00 PM", "Location": "Delmonico Entrance (Room)", "Status": "scheduled", "Attendees": "Brian Gallagher <bgallagher@esg.us>, Stefan Pancoe <spancoe@esg.us>", "Staff": "Captello Support <ll.support.12314@leadliaison.com>", "Checked-In Attendees": "Stefan Pancoe <spancoe@esg.us>"}, {"Meeting ID": "LY7VEA", "Meeting Title": "SSG - Meeting Space with Lenovo, Test 1", "Meeting Type": "SSG - Meeting Space", "Date": "Jan 06, 2027", "Start Time": "01:30 PM", "Location": "Delmonico - Banquette #1 (Room)", "Status": "canceled", "Attendees": "Stefan Pancoe <spancoeesg@gmail.com>", "Staff": "Stefan Pancoe <spancoe@esg.us>, Brian Gallagher <bgallagher@esg.us>", "Checked-In Attendees": null}, {"Meeting ID": "TQI2SG", "Meeting Title": "Delmonico's Entry with Lenovo, Test 1", "Meeting Type": "Delmonico Entry", "Date": "Jan 06, 2027", "Start Time": "09:30 AM", "Location": "Delmonico Entrance (Room)", "Status": "canceled", "Attendees": "Stefan Pancoe <spancoeesg@gmail.com>", "Staff": "Brian Gallagher <bgallagher@esg.us>", "Checked-In Attendees": null}, {"Meeting ID": "LZZDSX", "Meeting Title": "Delmonico's Entry with Lenovo", "Meeting Type": "Delmonico Entry", "Date": "Jan 06, 2027", "Start Time": "08:30 AM", "Location": "Delmonico Entrance (Room)", "Status": "canceled", "Attendees": null, "Staff": "Brian Gallagher <bgallagher@esg.us>", "Checked-In Attendees": null}, {"Meeting ID": "B2HFVL", "Meeting Title": "Motorola, Test 1", "Meeting Type": "Motorola - Meeting Space", "Date": "Jan 06, 2027", "Start Time": "12:45 PM", "Location": "Bassano 2803 (Room)", "Status": "scheduled", "Attendees": "Stefan Pancoe <spancoeesg@gmail.com>, Sample Customer 2 Sample Customer 2 <spancoeesg@esg.us>", "Staff": "Brian Gallagher <bgallagher@esg.us>, Stefan Pancoe <spancoe@esg.us>", "Checked-In Attendees": null}, {"Meeting ID": "GG0REH", "Meeting Title": "Delmonico's Entry with Lenovo, Test 2", "Meeting Type": "Delmonico Entry", "Date": "Jan 06, 2027", "Start Time": "11:45 AM", "Location": "Delmonico Entrance (Room)", "Status": "scheduled", "Attendees": "Sample Customer 2 Sample Customer 2 <spancoeesg@esg.us>", "Staff": "Stefan Pancoe <spancoe@esg.us>", "Checked-In Attendees": null}, {"Meeting ID": "Y7SFFV", "Meeting Title": "Customer tour - Test", "Meeting Type": "Delmonico Entry", "Date": "Jan 06, 2027", "Start Time": "10:30 AM", "Location": "Delmonico Entrance (Room)", "Status": "scheduled", "Attendees": "Stefan Pancoe <spancoeesg@gmail.com>, Brian Gal (TEST) <bgal707@gmail.com>", "Staff": "Stefan Pancoe <spancoe@esg.us>", "Checked-In Attendees": null}, {"Meeting ID": "U2KLQ3", "Meeting Title": "Lenovo ISG with Lenovo", "Meeting Type": "ISG - Meeting Space", "Date": "Jan 06, 2027", "Start Time": "08:15 AM", "Location": "Delmonico - ISG - Private Meeting Room - Cobblestone #3 (Room)", "Status": "rejected", "Attendees": null, "Staff": "Laura Lozado <llozada@lenovo.com>, Stefan Pancoe <spancoe@esg.us>, Christine Universal <cuniversal@lenovo.com>", "Checked-In Attendees": null}];
+const SEED_NAME = "Lenovo_Lenovo--TWCES-27_Meetings_2026-10-08-1.xls";
+const VENUES = [
+  {key:"Delmonico", color:"--s-del", prio:true},
+  {key:"Gjelina",   color:"--s-gje", prio:true},
+  {key:"Milos",     color:"--s-mil", prio:false},
+  {key:"Other",     color:"--s-oth", prio:false, label:"Other spaces"},
+];
+const DEFAULT_CAPS = {Delmonico:100, Gjelina:"", Milos:100, Other:""};
+const STATUSES = ["scheduled","pending","canceled","rejected"];
+
+const store = {
+  get(k,d){try{const v=localStorage.getItem("venueload:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem("venueload:"+k,JSON.stringify(v))}catch(e){}}
+};
+
+let rows=[], srcName=SEED_NAME;
+const state = {
+  day: null,
+  statuses: new Set(store.get("statuses",["scheduled","pending"])),
+  withStaff: store.get("withStaff",false),
+  caps: Object.assign({}, DEFAULT_CAPS, store.get("caps",{})),
+};
+
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const css = v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+function countPeople(s){
+  if(!s) return 0;
+  const m = String(s).match(/<[^>]+>/g);
+  if(m) return m.length;
+  return String(s).split(/[,;]/).map(x=>x.trim()).filter(Boolean).length;
+}
+function venueOf(loc){
+  const l=(loc||"").toLowerCase();
+  for(const v of ["Delmonico","Gjelina","Milos"]) if(l.includes(v.toLowerCase())) return v;
+  return "Other";
+}
+function parseHour(t){
+  if(t==null) return null;
+  if(typeof t==="number"){ return Math.floor((t%1)*24); }
+  const m=String(t).trim().match(/^(\d{1,2}):(\d{2})\s*([AaPp][Mm])?/);
+  if(!m) return null;
+  let h=+m[1]; const ap=(m[3]||"").toUpperCase();
+  if(ap==="PM"&&h<12) h+=12; if(ap==="AM"&&h===12) h=0;
+  return h;
+}
+function parseDate(d){
+  if(d==null) return null;
+  if(d instanceof Date) return d;
+  if(typeof d==="number") return new Date(Math.round((d-25569)*864e5)+new Date().getTimezoneOffset()*6e4);
+  const x=new Date(String(d)); return isNaN(x)?null:x;
+}
+const dayKey = d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const dayLabel = k=>{const [y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})};
+const hourLabel = h=>(h%12||12)+(h<12?" AM":" PM");
+
+function normalize(raw){
+  const pick=(r,names)=>{for(const n of names){const k=Object.keys(r).find(k=>k.trim().toLowerCase()===n);if(k!==undefined&&r[k]!==""&&r[k]!=null) return r[k]}return null};
+  const out=[];
+  for(const r of raw){
+    const d=parseDate(pick(r,["date"])); const h=parseHour(pick(r,["start time"]));
+    const loc=pick(r,["location"]);
+    if(!d||h==null) continue;
+    out.push({
+      id:pick(r,["meeting id"])||"", title:pick(r,["meeting title"])||"", type:pick(r,["meeting type"])||"",
+      day:dayKey(d), hour:h, time:String(pick(r,["start time"])||""),
+      loc:String(loc||"").replace(/\s*\(Room\)\s*$/i,""), venue:venueOf(loc),
+      status:String(pick(r,["status"])||"").toLowerCase(),
+      guests:countPeople(pick(r,["attendees"])), staff:countPeople(pick(r,["staff"]))
+    });
+  }
+  return out;
+}
+
+function people(r){return r.guests+(state.withStaff?r.staff:0)}
+function active(){return rows.filter(r=>state.statuses.has(r.status))}
+function allDays(){return [...new Set(rows.map(r=>r.day))].sort()}
+function hourRange(){
+  const hs=rows.map(r=>r.hour); if(!hs.length) return [8,17];
+  return [Math.min(8,...hs), Math.max(17,...hs)];
+}
+function capOf(v){const c=parseFloat(state.caps[v]);return c>0?c:null}
+
+function renderControls(){
+  const days=allDays();
+  if(!state.day||(!days.includes(state.day)&&state.day!=="all")){
+    // default: busiest day by active people
+    const tot={}; active().forEach(r=>tot[r.day]=(tot[r.day]||0)+people(r));
+    state.day = days.slice().sort((a,b)=>(tot[b]||0)-(tot[a]||0))[0]||"all";
+  }
+  $("#days").innerHTML = days.map(d=>`<button class="chip" id="day-${d}" data-day="${d}" aria-pressed="${state.day===d}">${dayLabel(d)}</button>`).join("")
+    + `<button class="chip" id="day-all" data-day="all" aria-pressed="${state.day==="all"}">All days</button>`;
+  $("#statuses").innerHTML = STATUSES.map(s=>{
+    const n=rows.filter(r=>r.status===s).length;
+    return `<button class="chip" id="st-${s}" data-st="${s}" aria-pressed="${state.statuses.has(s)}" style="text-transform:capitalize">${s} · ${n}</button>`}).join("");
+  $("#countMode").innerHTML = `<button class="chip" id="cm-g" data-cm="0" aria-pressed="${!state.withStaff}">Guests</button><button class="chip" id="cm-s" data-cm="1" aria-pressed="${state.withStaff}">Guests + staff</button>`;
+  $("#caps").innerHTML = VENUES.map(v=>`<label class="cap"><i style="background:var(${v.color})"></i>${v.label||v.key}<input id="cap-${v.key}" data-cap="${v.key}" inputmode="numeric" value="${esc(state.caps[v.key])}" placeholder="—"></label>`).join("");
+}
+
+function hourly(venue, day){
+  const [h0,h1]=hourRange(); const counts={}, meets={};
+  for(let h=h0;h<=h1;h++){counts[h]=0;meets[h]=[]}
+  active().filter(r=>r.venue===venue&&(day==="all"||r.day===day)).forEach(r=>{counts[r.hour]=(counts[r.hour]||0)+people(r);(meets[r.hour]=meets[r.hour]||[]).push(r)});
+  return {counts,meets};
+}
+
+function statusPill(peak,cap){
+  if(cap==null) return `<span class="pill none">No cap set</span>`;
+  const p=peak/cap;
+  if(p>1) return `<span class="pill crit">▲ Over cap · ${Math.round(p*100)}%</span>`;
+  if(p>=.8) return `<span class="pill warn">● Near cap · ${Math.round(p*100)}%</span>`;
+  return `<span class="pill good">✓ Within cap · ${Math.round(p*100)}%</span>`;
+}
+
+function chartSVG(v, counts, meets, cap, tall){
+  const hours=Object.keys(counts).map(Number).sort((a,b)=>a-b);
+  const W=560, H=tall?220:150, L=34, R=8, T=14, B=24;
+  const max=Math.max(cap||0, ...hours.map(h=>counts[h]), 4);
+  const ymax=niceMax(max*1.08);
+  const iw=W-L-R, ih=H-T-B, bw=iw/hours.length;
+  const y=val=>T+ih-(val/ymax)*ih;
+  const ticks=[0,ymax/2,ymax].map(Math.round);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(v.label||v.key)} attendees per hour">`;
+  ticks.forEach(t=>{s+=`<line x1="${L}" x2="${W-R}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)" stroke-width="1"/><text class="ax" x="${L-6}" y="${y(t)+4}" text-anchor="end">${Math.round(t)}</text>`});
+  hours.forEach((h,i)=>{
+    const c=counts[h], x=L+i*bw, bx=x+bw*0.18, w=bw*0.64;
+    if(c>0){
+      const top=y(c), hgt=Math.max(T+ih-top,2), r=Math.min(4,w/2,hgt);
+      const over=cap!=null&&c>cap;
+      s+=`<path d="M${bx},${T+ih} V${top+r} Q${bx},${top} ${bx+r},${top} H${bx+w-r} Q${bx+w},${top} ${bx+w},${top+r} V${T+ih} Z" fill="var(${over?"--crit":v.color})"/>`;
+      s+=`<text class="vl" x="${bx+w/2}" y="${top-4}" text-anchor="middle">${c}</text>`;
+    }
+    s+=`<rect x="${x}" y="${T}" width="${bw}" height="${ih}" fill="transparent" data-h="${h}" class="hit"/>`;
+    if(hours.length<=12||i%2===0) s+=`<text class="ax" x="${x+bw/2}" y="${H-6}" text-anchor="middle">${(h%12||12)}${h<12?"a":"p"}</text>`;
+  });
+  s+=`<line x1="${L}" x2="${W-R}" y1="${T+ih}" y2="${T+ih}" stroke="var(--muted)" stroke-width="1"/>`;
+  if(cap!=null){s+=`<line x1="${L}" x2="${W-R}" y1="${y(cap)}" y2="${y(cap)}" stroke="var(--fg2)" stroke-width="1.5" stroke-dasharray="5 4"/><text class="capl" x="${W-R}" y="${y(cap)-5}" text-anchor="end">CAP ${cap}/HR</text>`}
+  return s+"</svg>";
+}
+function niceMax(v){const p=Math.pow(10,Math.floor(Math.log10(v)));const n=v/p;return Math.max(4,(n<=1?1:n<=1.2?1.2:n<=1.5?1.5:n<=2?2:n<=2.5?2.5:n<=3?3:n<=4?4:n<=5?5:n<=6?6:n<=8?8:10)*p)}
+
+function renderVenues(){
+  const day=state.day;
+  $("#dayTitle").textContent = (day==="all"?"All days combined":dayLabel(day));
+  const card=v=>{
+    const {counts,meets}=hourly(v.key,day); const cap=capOf(v.key);
+    const vals=Object.values(counts); const total=vals.reduce((a,b)=>a+b,0);
+    const peak=Math.max(0,...vals); const peakH=Object.keys(counts).find(h=>counts[h]===peak&&peak>0);
+    const nMeet=Object.values(meets).reduce((a,b)=>a+b.length,0);
+    const el=document.createElement("article"); el.className="card"+(v.prio?"":" secondary");
+    el.innerHTML=`<div class="vhead"><div class="vname"><i style="background:var(${v.color})"></i>${esc(v.label||v.key)}${v.prio?' <span class="prio">Priority</span>':""}</div>${statusPill(peak,cap)}</div>
+      <div class="stats"><div class="stat"><b>${total}</b><span>People</span></div><div class="stat"><b>${peak}${peakH?`<small style="font-size:12px;color:var(--muted);font-weight:400"> @ ${hourLabel(+peakH)}</small>`:""}</b><span>Peak hour</span></div><div class="stat"><b>${nMeet}</b><span>Meetings</span></div></div>
+      <div class="chart">${chartSVG(v,counts,meets,cap,v.prio)}<div class="tip" hidden></div></div>`;
+    const tip=el.querySelector(".tip"), wrap=el.querySelector(".chart");
+    el.querySelectorAll(".hit").forEach(rc=>{
+      const show=e=>{
+        const h=+rc.dataset.h, ms=meets[h]||[];
+        rc.setAttribute("fill","var(--sunken)"); rc.setAttribute("fill-opacity",".6");
+        tip.innerHTML=`<b>${hourLabel(h)}–${hourLabel((h+1)%24)}</b> · <b>${counts[h]}</b> ${counts[h]===1?"person":"people"}${cap?` (${Math.round(counts[h]/cap*100)}% of cap)`:""}`+
+          (ms.length?"<br>"+ms.slice(0,5).map(m=>`${esc(m.time)} · ${esc(m.loc.replace(/^(Delmonico|Gjelina|Milos)\s*-?\s*/i,"")||m.loc)} · ${people(m)}`).join("<br>")+(ms.length>5?`<br>+${ms.length-5} more`:""):"<br>No meetings");
+        tip.hidden=false;
+        const b=wrap.getBoundingClientRect(), rb=rc.getBoundingClientRect();
+        let left=rb.left-b.left+rb.width/2-tip.offsetWidth/2; left=Math.max(0,Math.min(left,b.width-tip.offsetWidth));
+        tip.style.left=left+"px"; tip.style.top=(rb.top-b.top-tip.offsetHeight-4)+"px";
+      };
+      const hide=()=>{tip.hidden=true;rc.setAttribute("fill","transparent")};
+      rc.addEventListener("mouseenter",show); rc.addEventListener("mouseleave",hide);
+      rc.addEventListener("click",show);
+    });
+    return el;
+  };
+  $("#prio").replaceChildren(...VENUES.filter(v=>v.prio).map(card));
+  $("#secondary").replaceChildren(...VENUES.filter(v=>!v.prio).map(card));
+}
+
+function renderHeat(sel="#heat", filt=()=>true, totals=false){
+  const [h0,h1]=hourRange(); const hours=[]; for(let h=h0;h<=h1;h++) hours.push(h);
+  let html=`<thead><tr><th>Day</th><th>Venue</th>${hours.map(h=>`<th class="n">${hourLabel(h)}</th>`).join("")}<th class="n">Total</th></tr></thead><tbody>`;
+  const act=active().filter(filt);
+  // max count per uncapped venue for scaling
+  const cellMax={};
+  allDays().forEach(d=>VENUES.forEach(v=>hours.forEach(h=>{const c=act.filter(r=>r.day===d&&r.venue===v.key&&r.hour===h).reduce((a,r)=>a+people(r),0);cellMax[v.key]=Math.max(cellMax[v.key]||1,c)})));
+  allDays().forEach(d=>{
+    VENUES.forEach((v,vi)=>{
+      const cap=capOf(v.key); let tot=0;
+      const cells=hours.map(h=>{
+        const c=act.filter(r=>r.day===d&&r.venue===v.key&&r.hour===h).reduce((a,r)=>a+people(r),0); tot+=c;
+        if(!c) return `<td class="cell" style="color:var(--line)">·</td>`;
+        const share=cap?Math.min(c/cap,1):c/cellMax[v.key];
+        const over=cap&&c>cap;
+        const a=Math.round(18+share*62);
+        return `<td class="cell" title="${c} people${cap?` · ${Math.round(c/cap*100)}% of cap`:""}" style="background:color-mix(in srgb, var(${over?"--crit":v.color}) ${a}%, transparent);font-weight:600">${c}</td>`;
+      }).join("");
+      html+=`<tr${vi===0?' style="border-top:2px solid var(--line)"':""}>${vi===0?`<td rowspan="${VENUES.length+(totals?1:0)}" style="vertical-align:top;font-weight:600">${dayLabel(d)}</td>`:""}<td><span class="vdot" style="background:var(${v.color})"></span>${esc(v.label||v.key)}</td>${cells}<td class="n" style="font-weight:600">${tot}</td></tr>`;
+    });
+    if(totals){let tot=0;const cells=hours.map(h=>{const c=act.filter(r=>r.day===d&&r.hour===h).reduce((a,r)=>a+people(r),0);tot+=c;return `<td class="cell" style="font-weight:600;${c?"":"color:var(--line)"}">${c||"·"}</td>`}).join("");
+      html+=`<tr style="background:var(--sunken)"><td style="font-weight:600">All venues</td>${cells}<td class="n" style="font-weight:700">${tot}</td></tr>`;}
+  });
+  $(sel).innerHTML=html+"</tbody>";
+}
+
+const isEntry=r=>/\b(entry|entrance)\b/i.test(r.loc)||/\bentry\b/i.test(r.type);
+state.entryMode="entry";
+function renderEntry(){
+  const want=state.entryMode==="entry";
+  const filt=r=>isEntry(r)===want;
+  const act=active().filter(filt);
+  const total=act.reduce((a,r)=>a+people(r),0);
+  const slot={}; act.forEach(r=>{const k=r.day+"|"+r.hour;slot[k]=(slot[k]||0)+people(r)});
+  const best=Object.entries(slot).sort((a,b)=>b[1]-a[1])[0];
+  const byV={}; act.forEach(r=>byV[r.venue]=(byV[r.venue]||0)+people(r));
+  const vb=Object.entries(byV).sort((a,b)=>b[1]-a[1])[0];
+  $("#entryChips").innerHTML=`<button class="chip" id="em-e" data-em="entry" aria-pressed="${want}">Entry only</button><button class="chip" id="em-n" data-em="other" aria-pressed="${!want}">All other meetings</button>`;
+  const lbl=k=>{const v=VENUES.find(x=>x.key===k);return v?(v.label||v.key):k};
+  $("#entryStats").innerHTML=`<div class="stat"><b>${total}</b><span>People</span></div><div class="stat"><b>${act.length}</b><span>Meetings</span></div><div class="stat"><b>${best?best[1]:0}</b><span>${best?"Peak · "+dayLabel(best[0].split("|")[0])+" "+hourLabel(+best[0].split("|")[1]):"Peak hour"}</span></div><div class="stat"><b style="font-family:var(--f-display)">${vb?esc(lbl(vb[0])):"—"}</b><span>${vb?"Busiest venue · "+vb[1]:"Busiest venue"}</span></div>`;
+  $("#entryNote").textContent=want?"Meetings whose location or type contains Entry / Entrance":"Every meeting that is not an Entry booking";
+  renderHeat("#heatEntry",filt,true);
+}
+
+function renderList(){
+  const day=state.day;
+  const order={Delmonico:0,Gjelina:1,Milos:2,Other:3};
+  const list=rows.filter(r=>day==="all"||r.day===day).sort((a,b)=>a.day.localeCompare(b.day)||a.hour-b.hour||a.time.localeCompare(b.time)||order[a.venue]-order[b.venue]);
+  $("#listTitle").textContent="Meetings · "+(day==="all"?"all days":dayLabel(day));
+  $("#listNote").textContent="Struck-through statuses are excluded from counts when their filter is off.";
+  const v=k=>VENUES.find(x=>x.key===k);
+  $("#list").innerHTML=`<thead><tr>${day==="all"?"<th>Day</th>":""}<th>Start</th><th>Venue</th><th>Location</th><th>Meeting</th><th>Status</th><th class="n">Guests</th><th class="n">Staff</th></tr></thead><tbody>`+
+    list.map(r=>{const counted=state.statuses.has(r.status);return `<tr style="${counted?"":"opacity:.5"}">${day==="all"?`<td>${dayLabel(r.day)}</td>`:""}<td class="n">${esc(r.time)}</td><td><span class="vdot" style="background:var(${v(r.venue).color})"></span>${esc(v(r.venue).label||r.venue)}</td><td class="wrapc">${esc(r.loc)}</td><td class="wrapc">${esc(r.title)}<div class="note">${esc(r.id)} · ${esc(r.type)}</div></td><td><span class="st ${esc(r.status)}">${esc(r.status)}</span></td><td class="n">${r.guests}</td><td class="n">${r.staff}</td></tr>`}).join("")+
+    (list.length?"":`<tr><td colspan="8" class="note">No meetings on this day.</td></tr>`)+"</tbody>";
+}
+
+function render(){ $("#srcName").textContent=srcName; renderControls(); renderVenues(); renderHeat(); renderEntry(); renderList(); }
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button.chip"); if(!b) return;
+  if(b.dataset.day){state.day=b.dataset.day}
+  if(b.dataset.em){state.entryMode=b.dataset.em}
+  if(b.dataset.st){const s=b.dataset.st; state.statuses.has(s)?state.statuses.delete(s):state.statuses.add(s); store.set("statuses",[...state.statuses])}
+  if(b.dataset.cm){state.withStaff=b.dataset.cm==="1"; store.set("withStaff",state.withStaff)}
+  render();
+});
+document.addEventListener("change",e=>{
+  if(e.target.dataset.cap){state.caps[e.target.dataset.cap]=e.target.value.trim(); store.set("caps",state.caps); render()}
+});
+document.querySelector('label[for="file"]').addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#file").click()}});
+$("#file").addEventListener("change",async e=>{
+  const f=e.target.files[0]; if(!f) return; const err=$("#fileErr"); err.hidden=true;
+  try{
+    if(!window.XLSX) throw new Error("The spreadsheet reader didn't load. Check your connection and try again.");
+    const wb=XLSX.read(await f.arrayBuffer(),{type:"array"});
+    const raw=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{raw:false,defval:""});
+    const n=normalize(raw);
+    if(!n.length) throw new Error("No meetings found. Use the Meetings export, which has Date, Start Time, Location and Attendees columns.");
+    rows=n; srcName=f.name; state.day=null; render();
+  }catch(x){err.textContent=x.message; err.hidden=false}
+  e.target.value="";
+});
+
+rows=normalize(SEED); render();
+</script>
+
+</body></html>
